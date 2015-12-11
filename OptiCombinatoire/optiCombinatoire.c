@@ -180,7 +180,7 @@ void afficherSolutionGlouton (InstanceSacADosSolution S) {
 */
 void SolutionUsingAlgoGlouton (InstanceSacADosSolution *S, int isSolutionContinue)
 {
-    int i, j;
+    int i;
     //Création du tableau d'index dans le bon ordre pour l'algorithme
     int tab[S->instance.nbrObjet];
     //init
@@ -205,20 +205,28 @@ void SolutionUsingAlgoGlouton (InstanceSacADosSolution *S, int isSolutionContinu
     afficherSolutionGlouton(*S);
 };
 
-
+void resetSolution(InstanceSacADosSolution *S){
+    int i;
+    S->solution.poidsTotalSolution = 0;
+    for(i=0; i < S->instance.nbrObjet; i++){
+        S->solution.objetsSolution[i].present = 0;
+    }
+};
 
 int main()
 {
     char nomFichier[50];
 
-    printf("Hello world!\n");
+    printf("Quel est le nom du fichier a charger ? (n'oubliez pas le .txt)\n");
     scanf("%s", nomFichier);
     printf("\n");
     InstanceSacADosSolution S;
     S = chargementSacADos(nomFichier);
 
-    afficherSacADosComplet(S);
-
+    printf("Resultat de l'heuristique gloutonne en relaxation continue :\n");
     SolutionUsingAlgoGlouton(&S, 0);
+    resetSolution(&S);
+    printf("Resultat de l'heuristique gloutonne avec une solution realisable:\n");
+    SolutionUsingAlgoGlouton(&S,1);
     return 0;
 }
