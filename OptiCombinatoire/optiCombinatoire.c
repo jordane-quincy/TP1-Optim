@@ -89,6 +89,42 @@ void afficherSacADosComplet(InstanceSacADosSolution S) {
 
 };
 
+void ajouterTrie (int *tab, Objet objet, int index, Objet *objets, int taille) {
+    int i = 0;
+    int tmp;
+    int ajoute = 0;
+    while (!ajoute && i < taille) {
+        if (tab[i] == -1) {
+            tab[i] = index;
+        }
+        else {
+            if (objets[tab[i]].profit / objets[tab[i]].poids > objet.profit / objet.poids) {
+                ajoute = 1;
+                tmp = tab[i];
+                tab[i] = index;
+            }
+        }
+        i++;
+    }
+    int j;
+    for (j = )
+
+};
+
+void triAlgoGlouton (InstanceSacADosSolution *S) {
+    int i;
+    //Création du tableau d'index dans le bon ordre pour l'algorithme
+    int tab[S->instance.nbrObjet];
+    //init
+    for (i = 0; i < S->instance.nbrObjet; i++) {
+        tab[i] = -1;
+    }
+    for (i = 0; i < S->instance.nbrObjet; i++) {
+        ajouterTrie(&tab, S->instance.objets[i], i, S->instance.objets, S->instance.nbrObjet);
+    }
+
+};
+
 int main()
 {
     char nomFichier[50];
