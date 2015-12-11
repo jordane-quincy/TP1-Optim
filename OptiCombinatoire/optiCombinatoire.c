@@ -1,3 +1,9 @@
+/*
+    TP Optimisation Combinatoire Jordane QUINCY et Jean-Baptiste DURIEZ
+    Etat : Exercice 1 fini, en cours : Exercice 2
+    Version : 11/12/2015 (Première séance de TP)
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -21,8 +27,14 @@ typedef struct {
 }InstanceSacADos;
 
 typedef struct {
-    ObjetSolution *solution;
+    ObjetSolution *objetsSolution;
+    int poidsTotalSolution;
+}SolutionSacADos;
+
+typedef struct {
+
     InstanceSacADos instance;
+    SolutionSacADos solution;
 }InstanceSacADosSolution;
 
 InstanceSacADosSolution initialisation(int nbrObjet, int capaciteMax,Objet *objets) {
@@ -31,15 +43,16 @@ InstanceSacADosSolution initialisation(int nbrObjet, int capaciteMax,Objet *obje
     S.instance.nbrObjet = nbrObjet;
     S.instance.capaciteMax = capaciteMax;
     S.instance.objets = malloc(nbrObjet * (sizeof(Objet)));
+    S.solution.poidsTotalSolution = 0;
 
     //Initialiser objets et solution a vide et tous les objets non présent
-    S.solution = malloc(nbrObjet * (sizeof(ObjetSolution)));
+    S.solution.objetsSolution = malloc(nbrObjet * (sizeof(ObjetSolution)));
     for (i = 0; i < nbrObjet; i++) {
         S.instance.objets[i].profit = objets[i].profit;
         S.instance.objets[i].poids = objets[i].poids;
-        S.solution[i].objet.profit = objets[i].profit;
-        S.solution[i].objet.poids =objets[i].poids;
-        S.solution[i].present = 0;
+        S.solution.objetsSolution[i].objet.profit = objets[i].profit;
+        S.solution.objetsSolution[i].objet.poids =objets[i].poids;
+        S.solution.objetsSolution[i].present = 0;
     }
     return S;
 };
@@ -50,9 +63,12 @@ InstanceSacADosSolution initialisation(int nbrObjet, int capaciteMax,Objet *obje
 */
 InstanceSacADosSolution chargementSacADos (char *nom) {
     int nbObjets, capaciteMax;
+    printf("chargementSacADos du fichier : '%s'\n", nom);
+
     FILE *f = fopen(nom, "r");
     //Lire le nbr d'objets et la capacite maximale du sac
     fscanf(f,"%d %d\n",&nbObjets, &capaciteMax);
+    printf("nbObjets=%d ,capaciteMax=%d \n", nbObjets,capaciteMax);
 
     //On va stocker les profits et poids dans un tableau .
     Objet *tabObjet = malloc(nbObjets*sizeof(Objet));
@@ -62,11 +78,13 @@ InstanceSacADosSolution chargementSacADos (char *nom) {
     for (n = 0; n < nbObjets; n++) {
         fscanf(f, "%d", &curProfit);
         tabObjet[n].profit = curProfit;
+        printf("tabObjet[%d].profit = %d \n", n,curProfit);
     }
     //On lit la ligne des poids
     for (n = 0; n < nbObjets; n++) {
         fscanf(f, "%d", &curPoids);
         tabObjet[n].poids = curPoids;
+        printf(" tabObjet[%d].poids = %d \n", n,curPoids);
     }
 
     fclose(f);
@@ -74,7 +92,13 @@ InstanceSacADosSolution chargementSacADos (char *nom) {
 };
 
 void afficherSacADosComplet(InstanceSacADosSolution S) {
+    InstanceSacADos sac = S.instance;
 
+    int i;
+    for(i=0; i < sac.nbrObjet; i++){
+        Objet curObjet = sac.objets[i];
+        printf("i=%d %d,%d \n", i,curObjet.poids,curObjet.profit );
+    }
 };
 
 int main()
@@ -86,6 +110,8 @@ int main()
     printf("\n");
     InstanceSacADosSolution S;
     S = chargementSacADos(nomFichier);
+
+    afficherSacADosComplet(S);
 
     return 0;
 }
