@@ -32,7 +32,6 @@ typedef struct {
 }SolutionSacADos;
 
 typedef struct {
-
     InstanceSacADos instance;
     SolutionSacADos solution;
 }InstanceSacADosSolution;
