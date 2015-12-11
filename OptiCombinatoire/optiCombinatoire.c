@@ -1,6 +1,6 @@
 /*
     TP Optimisation Combinatoire Jordane QUINCY et Jean-Baptiste DURIEZ
-    Etat : Exercice 1 fini, en cours : Exercice 2
+    Etat : Exercice 1 et 2 finis, en cours : Exercice 3
     Version : 11/12/2015 (Première séance de TP)
 */
 
@@ -18,7 +18,7 @@ typedef struct
 typedef struct
 {
     Objet objet;
-    int present; //1 si present dans le sac, 0 sinon
+    float present; //1 si present dans le sac, 0 sinon
 } ObjetSolution;
 
 
@@ -154,6 +154,29 @@ void ajouterTrie (int *tab, Objet objet, int index, Objet *objets, int taille)
     }
 };
 
+void afficherSolutionGlouton (InstanceSacADosSolution S) {
+    int i;
+    float solutionOpti = 0;
+    for (i = 0; i < S.instance.nbrObjet; i++) {
+        if (S.solution.objetsSolution[i].present == 0) {
+            printf("L'objet numero %d n'est pas ajoute\n", i);
+        }
+        else {
+            printf("L'objet numero %d est ajoute ", i);
+            if (S.solution.objetsSolution[i].present == 1) {
+                printf("entierement\n");
+            }
+            else {
+                printf("partiellement (a %.2f%%)\n", S.solution.objetsSolution[i].present * 100);
+            }
+        }
+        solutionOpti += (float)(S.solution.objetsSolution[i].present) * S.solution.objetsSolution[i].objet.profit;
+    }
+    printf("La valeur de la solution optimale avec l'heuristique gloutonne est : %.2f\n", solutionOpti);
+
+};
+
+
 void triAlgoGlouton (InstanceSacADosSolution *S)
 {
     int i, j;
@@ -168,8 +191,20 @@ void triAlgoGlouton (InstanceSacADosSolution *S)
     {
         ajouterTrie(&tab, S->instance.objets[i], i, S->instance.objets, S->instance.nbrObjet);
     }
-
+    for (i = 0; i < S->instance.nbrObjet; i++) {
+        if (S->solution.poidsTotalSolution + S->instance.objets[tab[i]].poids <= S->instance.capaciteMax){
+            S->solution.poidsTotalSolution += S->instance.objets[tab[i]].poids;
+            S->solution.objetsSolution[tab[i]].present = 1;
+        }
+        else {
+            S->solution.objetsSolution[tab[i]].present = (float)(S->instance.capaciteMax - S->solution.poidsTotalSolution) / S->instance.objets[tab[i]].poids;
+            S->solution.poidsTotalSolution = S->instance.capaciteMax;
+        }
+    }
+    afficherSolutionGlouton(*S);
 };
+
+
 
 int main()
 {
