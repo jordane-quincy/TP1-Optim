@@ -1,3 +1,9 @@
+/*
+    TP Optimisation Combinatoire Jordane QUINCY et Jean-Baptiste DURIEZ
+    Etat : Exercice 1 fini, en cours : Exercice 2
+    Version : 11/12/2015 (Première séance de TP)
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -21,8 +27,13 @@ typedef struct {
 }InstanceSacADos;
 
 typedef struct {
-    ObjetSolution *solution;
+    ObjetSolution *objetsSolution;
+    int poidsTotalSolution;
+}SolutionSacADos;
+
+typedef struct {
     InstanceSacADos instance;
+    SolutionSacADos solution;
 }InstanceSacADosSolution;
 
 InstanceSacADosSolution initialisation(int nbrObjet, int capaciteMax,Objet *objets) {
@@ -31,15 +42,16 @@ InstanceSacADosSolution initialisation(int nbrObjet, int capaciteMax,Objet *obje
     S.instance.nbrObjet = nbrObjet;
     S.instance.capaciteMax = capaciteMax;
     S.instance.objets = malloc(nbrObjet * (sizeof(Objet)));
+    S.solution.poidsTotalSolution = 0;
 
     //Initialiser objets et solution a vide et tous les objets non présent
-    S.solution = malloc(nbrObjet * (sizeof(ObjetSolution)));
+    S.solution.objetsSolution = malloc(nbrObjet * (sizeof(ObjetSolution)));
     for (i = 0; i < nbrObjet; i++) {
         S.instance.objets[i].profit = objets[i].profit;
         S.instance.objets[i].poids = objets[i].poids;
-        S.solution[i].objet.profit = objets[i].profit;
-        S.solution[i].objet.poids =objets[i].poids;
-        S.solution[i].present = 0;
+        S.solution.objetsSolution[i].objet.profit = objets[i].profit;
+        S.solution.objetsSolution[i].objet.poids =objets[i].poids;
+        S.solution.objetsSolution[i].present = 0;
     }
     return S;
 };
