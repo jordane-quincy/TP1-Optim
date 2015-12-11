@@ -173,8 +173,12 @@ void afficherSolutionGlouton (InstanceSacADosSolution S) {
 
 };
 
-
-void triAlgoGlouton (InstanceSacADosSolution *S)
+/*
+    SolutionUsingAlgoGlouton permet de donner une solution optimale du problème de sac à dos en utilisant l'heuristique gloutonne
+    S : l'instance du sac à dos
+    isSolutionContinue : si 1 alors on donne la solution continu, si 0 on donne la solution réalisable
+*/
+void SolutionUsingAlgoGlouton (InstanceSacADosSolution *S, int isSolutionContinue)
 {
     int i, j;
     //Création du tableau d'index dans le bon ordre pour l'algorithme
@@ -193,7 +197,7 @@ void triAlgoGlouton (InstanceSacADosSolution *S)
             S->solution.poidsTotalSolution += S->instance.objets[tab[i]].poids;
             S->solution.objetsSolution[tab[i]].present = 1;
         }
-        else {
+        else if (isSolutionContinue){
             S->solution.objetsSolution[tab[i]].present = (float)(S->instance.capaciteMax - S->solution.poidsTotalSolution) / S->instance.objets[tab[i]].poids;
             S->solution.poidsTotalSolution = S->instance.capaciteMax;
         }
@@ -214,6 +218,7 @@ int main()
     S = chargementSacADos(nomFichier);
 
     afficherSacADosComplet(S);
-    triAlgoGlouton(&S);
+
+    SolutionUsingAlgoGlouton(&S, 0);
     return 0;
 }
