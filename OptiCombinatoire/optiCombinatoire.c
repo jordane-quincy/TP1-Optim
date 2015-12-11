@@ -70,12 +70,10 @@ InstanceSacADosSolution initialisation(int nbrObjet, int capaciteMax,Objet *obje
 InstanceSacADosSolution chargementSacADos (char *nom)
 {
     int nbObjets, capaciteMax;
-    printf("chargementSacADos du fichier : '%s'\n", nom);
 
     FILE *f = fopen(nom, "r");
     //Lire le nbr d'objets et la capacite maximale du sac
     fscanf(f,"%d %d\n",&nbObjets, &capaciteMax);
-    printf("nbObjets=%d ,capaciteMax=%d \n", nbObjets,capaciteMax);
 
     //On va stocker les profits et poids dans un tableau .
     Objet *tabObjet = malloc(nbObjets*sizeof(Objet));
@@ -86,14 +84,12 @@ InstanceSacADosSolution chargementSacADos (char *nom)
     {
         fscanf(f, "%d", &curProfit);
         tabObjet[n].profit = curProfit;
-        printf("tabObjet[%d].profit = %d \n", n,curProfit);
     }
     //On lit la ligne des poids
     for (n = 0; n < nbObjets; n++)
     {
         fscanf(f, "%d", &curPoids);
         tabObjet[n].poids = curPoids;
-        printf(" tabObjet[%d].poids = %d \n", n,curPoids);
     }
 
     fclose(f);
@@ -108,8 +104,9 @@ void afficherSacADosComplet(InstanceSacADosSolution S)
     for(i=0; i < sac.nbrObjet; i++)
     {
         Objet curObjet = sac.objets[i];
-        printf("i=%d %d,%d \n", i,curObjet.poids,curObjet.profit );
+        printf("L'objet %d a pour poids %d et pour profit %d \n", i,curObjet.poids,curObjet.profit );
     }
+    printf("\n");
 };
 
 void ajouterTrie (int *tab, Objet objet, int index, Objet *objets, int taille)
