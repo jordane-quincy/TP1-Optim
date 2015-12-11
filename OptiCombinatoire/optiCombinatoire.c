@@ -9,34 +9,40 @@
 
 //Structure de données pour une instance du sac à dos
 
-typedef struct {
+typedef struct
+{
     int profit;
     int poids;
-}Objet;
+} Objet;
 
-typedef struct {
+typedef struct
+{
     Objet objet;
     int present; //1 si present dans le sac, 0 sinon
-}ObjetSolution;
+} ObjetSolution;
 
 
-typedef struct {
+typedef struct
+{
     int nbrObjet;
     int capaciteMax;
     Objet *objets; //Tableau stockant les objets objets[0][0] = le profit de l'object 0 et objets[0][1] = le poids de l'object 0
-}InstanceSacADos;
+} InstanceSacADos;
 
-typedef struct {
+typedef struct
+{
     ObjetSolution *objetsSolution;
     int poidsTotalSolution;
-}SolutionSacADos;
+} SolutionSacADos;
 
-typedef struct {
+typedef struct
+{
     InstanceSacADos instance;
     SolutionSacADos solution;
-}InstanceSacADosSolution;
+} InstanceSacADosSolution;
 
-InstanceSacADosSolution initialisation(int nbrObjet, int capaciteMax,Objet *objets) {
+InstanceSacADosSolution initialisation(int nbrObjet, int capaciteMax,Objet *objets)
+{
     InstanceSacADosSolution S;
     int i;
     S.instance.nbrObjet = nbrObjet;
@@ -46,7 +52,8 @@ InstanceSacADosSolution initialisation(int nbrObjet, int capaciteMax,Objet *obje
 
     //Initialiser objets et solution a vide et tous les objets non présent
     S.solution.objetsSolution = malloc(nbrObjet * (sizeof(ObjetSolution)));
-    for (i = 0; i < nbrObjet; i++) {
+    for (i = 0; i < nbrObjet; i++)
+    {
         S.instance.objets[i].profit = objets[i].profit;
         S.instance.objets[i].poids = objets[i].poids;
         S.solution.objetsSolution[i].objet.profit = objets[i].profit;
@@ -60,7 +67,8 @@ InstanceSacADosSolution initialisation(int nbrObjet, int capaciteMax,Objet *obje
     chargementSacADos : permet de charger les donnees dans une InstanceSacADosSolution depuis le fichier ayant comme chemin d'acces la variable nom
     nom : nom du fichier à lire
 */
-InstanceSacADosSolution chargementSacADos (char *nom) {
+InstanceSacADosSolution chargementSacADos (char *nom)
+{
     int nbObjets, capaciteMax;
     printf("chargementSacADos du fichier : '%s'\n", nom);
 
@@ -74,13 +82,15 @@ InstanceSacADosSolution chargementSacADos (char *nom) {
 
     int n, curProfit, curPoids;
     //On lit la ligne des profits
-    for (n = 0; n < nbObjets; n++) {
+    for (n = 0; n < nbObjets; n++)
+    {
         fscanf(f, "%d", &curProfit);
         tabObjet[n].profit = curProfit;
         printf("tabObjet[%d].profit = %d \n", n,curProfit);
     }
     //On lit la ligne des poids
-    for (n = 0; n < nbObjets; n++) {
+    for (n = 0; n < nbObjets; n++)
+    {
         fscanf(f, "%d", &curPoids);
         tabObjet[n].poids = curPoids;
         printf(" tabObjet[%d].poids = %d \n", n,curPoids);
@@ -90,26 +100,40 @@ InstanceSacADosSolution chargementSacADos (char *nom) {
     return initialisation(nbObjets, capaciteMax, tabObjet);
 };
 
-void afficherSacADosComplet(InstanceSacADosSolution S) {
+void afficherSacADosComplet(InstanceSacADosSolution S)
+{
     InstanceSacADos sac = S.instance;
 
     int i;
-    for(i=0; i < sac.nbrObjet; i++){
+    for(i=0; i < sac.nbrObjet; i++)
+    {
         Objet curObjet = sac.objets[i];
         printf("i=%d %d,%d \n", i,curObjet.poids,curObjet.profit );
     }
 };
 
-void ajouterTrie (int *tab, Objet objet, int index, Objet *objets, int taille) {
+void ajouterTrie (int *tab, Objet objet, int index, Objet *objets, int taille)
+{
     int i = 0;
+    double quotient1 = 0;
+    double quotient2 = 0;
+    int j;
     int tmp;
     int ajoute = 0;
-    while (!ajoute && i < taille) {
-        if (tab[i] == -1) {
+    int ajouteVide = 0;
+    while (!ajoute && !ajouteVide && i < taille)
+    {
+        if (tab[i] == -1)
+        {
             tab[i] = index;
+            ajouteVide = 1;
         }
-        else {
-            if (objets[tab[i]].profit / objets[tab[i]].poids > objet.profit / objet.poids) {
+        else
+        {
+            quotient1 = ((double)objets[tab[i]].profit)/((double)objets[tab[i]].poids);
+            quotient2 = ((double)objet.profit)/((double)objet.poids);
+            if (quotient1 < quotient2)
+            {
                 ajoute = 1;
                 tmp = tab[i];
                 tab[i] = index;
@@ -117,20 +141,31 @@ void ajouterTrie (int *tab, Objet objet, int index, Objet *objets, int taille) {
         }
         i++;
     }
-    int j;
-    for (j = )
-
+    if (!ajouteVide)
+    {
+        for (j = taille - 1; j > i; j--)
+        {
+            if (tab[j - 1] != -1)
+            {
+                tab[j] = tab[j - 1];
+            }
+        }
+        tab[i] = tmp;
+    }
 };
 
-void triAlgoGlouton (InstanceSacADosSolution *S) {
-    int i;
+void triAlgoGlouton (InstanceSacADosSolution *S)
+{
+    int i, j;
     //Création du tableau d'index dans le bon ordre pour l'algorithme
     int tab[S->instance.nbrObjet];
     //init
-    for (i = 0; i < S->instance.nbrObjet; i++) {
+    for (i = 0; i < S->instance.nbrObjet; i++)
+    {
         tab[i] = -1;
     }
-    for (i = 0; i < S->instance.nbrObjet; i++) {
+    for (i = 0; i < S->instance.nbrObjet; i++)
+    {
         ajouterTrie(&tab, S->instance.objets[i], i, S->instance.objets, S->instance.nbrObjet);
     }
 
@@ -147,6 +182,6 @@ int main()
     S = chargementSacADos(nomFichier);
 
     afficherSacADosComplet(S);
-
+    triAlgoGlouton(&S);
     return 0;
 }
