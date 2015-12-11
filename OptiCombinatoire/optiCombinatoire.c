@@ -48,7 +48,7 @@ InstanceSacADosSolution initialisation(int nbrObjet, int capaciteMax,Objet *obje
     chargementGraphe : permet de charger le graphe depuis le fichier ayant comme nom la variable nom
     nom : nom du fichier à lire
 */
-void chargementGraphe (char *nom) {
+InstanceSacADosSolution chargementGraphe (char *nom) {
     int nbObjets, capaciteMax;
     FILE *f = fopen(nom, "r");
     //Lire le nbr d'objets et la capacite maximale du sac
@@ -70,7 +70,7 @@ void chargementGraphe (char *nom) {
     }
 
     fclose(f);
-    InstanceSacADosSolution S = initialisation(nbObjets, capaciteMax, matrice);
+    return initialisation(nbObjets, capaciteMax, matrice);
 };
 
 int main()
@@ -80,7 +80,8 @@ int main()
     printf("Hello world!\n");
     scanf("%s", nomFichier);
     printf("\n");
-    chargementGraphe(nomFichier);
+    InstanceSacADosSolution S;
+    S = chargementGraphe(nomFichier);
 
     return 0;
 }
