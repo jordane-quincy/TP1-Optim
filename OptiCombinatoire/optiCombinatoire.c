@@ -73,6 +73,10 @@ InstanceSacADosSolution chargementSacADos (char *nom) {
     return initialisation(nbObjets, capaciteMax, tabObjet);
 };
 
+void afficherSacADosComplet(InstanceSacADosSolution S) {
+
+};
+
 int main()
 {
     char nomFichier[50];
