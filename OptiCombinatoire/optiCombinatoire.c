@@ -45,32 +45,32 @@ InstanceSacADosSolution initialisation(int nbrObjet, int capaciteMax,Objet *obje
 };
 
 /*
-    chargementGraphe : permet de charger le graphe depuis le fichier ayant comme nom la variable nom
+    chargementSacADos : permet de charger les donnees dans une InstanceSacADosSolution depuis le fichier ayant comme chemin d'acces la variable nom
     nom : nom du fichier à lire
 */
-InstanceSacADosSolution chargementGraphe (char *nom) {
+InstanceSacADosSolution chargementSacADos (char *nom) {
     int nbObjets, capaciteMax;
     FILE *f = fopen(nom, "r");
     //Lire le nbr d'objets et la capacite maximale du sac
     fscanf(f,"%d %d\n",&nbObjets, &capaciteMax);
 
     //On va stocker les profits et poids dans un tableau .
-    Objet *matrice = malloc(nbObjets*sizeof(Objet));
+    Objet *tabObjet = malloc(nbObjets*sizeof(Objet));
 
     int n, curProfit, curPoids;
     //On lit la ligne des profits
     for (n = 0; n < nbObjets; n++) {
         fscanf(f, "%d", &curProfit);
-        matrice[n].profit = curProfit;
+        tabObjet[n].profit = curProfit;
     }
     //On lit la ligne des poids
     for (n = 0; n < nbObjets; n++) {
         fscanf(f, "%d", &curPoids);
-        matrice[n].poids = curPoids;
+        tabObjet[n].poids = curPoids;
     }
 
     fclose(f);
-    return initialisation(nbObjets, capaciteMax, matrice);
+    return initialisation(nbObjets, capaciteMax, tabObjet);
 };
 
 int main()
@@ -81,7 +81,7 @@ int main()
     scanf("%s", nomFichier);
     printf("\n");
     InstanceSacADosSolution S;
-    S = chargementGraphe(nomFichier);
+    S = chargementSacADos(nomFichier);
 
     return 0;
 }
