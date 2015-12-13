@@ -151,19 +151,25 @@ void ajouterTrie (int *tab, Objet objet, int index, Objet *objets, int taille)
     }
 };
 
-void afficherSolutionGlouton (InstanceSacADosSolution S) {
+void afficherSolutionGlouton (InstanceSacADosSolution S)
+{
     int i;
     float solutionOpti = 0;
-    for (i = 0; i < S.instance.nbrObjet; i++) {
-        if (S.solution.objetsSolution[i].present == 0) {
+    for (i = 0; i < S.instance.nbrObjet; i++)
+    {
+        if (S.solution.objetsSolution[i].present == 0)
+        {
             printf("L'objet numero %d n'est pas ajoute\n", i);
         }
-        else {
+        else
+        {
             printf("L'objet numero %d est ajoute ", i);
-            if (S.solution.objetsSolution[i].present == 1) {
+            if (S.solution.objetsSolution[i].present == 1)
+            {
                 printf("entierement\n");
             }
-            else {
+            else
+            {
                 printf("partiellement (a %.2f%%)\n", S.solution.objetsSolution[i].present * 100);
             }
         }
@@ -192,12 +198,15 @@ void SolutionUsingAlgoGlouton (InstanceSacADosSolution *S, int isSolutionContinu
     {
         ajouterTrie(&tab, S->instance.objets[i], i, S->instance.objets, S->instance.nbrObjet);
     }
-    for (i = 0; i < S->instance.nbrObjet; i++) {
-        if (S->solution.poidsTotalSolution + S->instance.objets[tab[i]].poids <= S->instance.capaciteMax){
+    for (i = 0; i < S->instance.nbrObjet; i++)
+    {
+        if (S->solution.poidsTotalSolution + S->instance.objets[tab[i]].poids <= S->instance.capaciteMax)
+        {
             S->solution.poidsTotalSolution += S->instance.objets[tab[i]].poids;
             S->solution.objetsSolution[tab[i]].present = 1;
         }
-        else if (isSolutionContinue){
+        else if (isSolutionContinue)
+        {
             S->solution.objetsSolution[tab[i]].present = (float)(S->instance.capaciteMax - S->solution.poidsTotalSolution) / S->instance.objets[tab[i]].poids;
             S->solution.poidsTotalSolution = S->instance.capaciteMax;
         }
@@ -205,10 +214,12 @@ void SolutionUsingAlgoGlouton (InstanceSacADosSolution *S, int isSolutionContinu
     afficherSolutionGlouton(*S);
 };
 
-void resetSolution(InstanceSacADosSolution *S){
+void resetSolution(InstanceSacADosSolution *S)
+{
     int i;
     S->solution.poidsTotalSolution = 0;
-    for(i=0; i < S->instance.nbrObjet; i++){
+    for(i=0; i < S->instance.nbrObjet; i++)
+    {
         S->solution.objetsSolution[i].present = 0;
     }
 };
@@ -216,17 +227,39 @@ void resetSolution(InstanceSacADosSolution *S){
 int main()
 {
     char nomFichier[50];
-
     printf("Quel est le nom du fichier a charger ? (n'oubliez pas le .txt)\n");
     scanf("%s", nomFichier);
     printf("\n");
     InstanceSacADosSolution S;
     S = chargementSacADos(nomFichier);
-
-    printf("Resultat de l'heuristique gloutonne en relaxation continue :\n");
-    SolutionUsingAlgoGlouton(&S, 0);
-    resetSolution(&S);
-    printf("Resultat de l'heuristique gloutonne avec une solution realisable:\n");
-    SolutionUsingAlgoGlouton(&S,1);
+    int choix;
+    //Menu :
+    do
+    {
+        printf("\n\n------------------------------------------\n");
+        printf("Que souhaitez-vous faire ? \n");
+        printf("1 - Resoudre le probleme du sac a dos en utilisant l'heuristique gloutonne (relaxation continue)\n");
+        printf("2 - Resoudre le probleme du sav a dos en utilisant l'heuristique gloutonne (solution realisable)\n");
+        printf("0 - Sortir du programme ? \n");
+        scanf("%d", &choix);
+        printf("\n\n");
+        switch (choix)
+        {
+        case 1:
+            printf("Resultat du probeme de sac a dos avec l'heuristique gloutonne en relaxation continue : \n");
+            resetSolution(&S);
+            SolutionUsingAlgoGlouton(&S, 1);
+            break;
+        case 2:
+            printf("Resultat du probleme de sac a dos avec l'istique gloutonne avec une solution realisable :\n");
+            resetSolution(&S);
+            SolutionUsingAlgoGlouton(&S, 0);
+            break;
+        default:
+            printf("Au revoir\n");
+            break;
+        }
+    }
+    while (choix != 0);
     return 0;
 }
