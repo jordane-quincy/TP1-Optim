@@ -180,11 +180,11 @@ void afficherSolutionGlouton (InstanceSacADosSolution S)
 };
 
 /*
-    SolutionUsingAlgoGlouton permet de donner une solution optimale du problème de sac à dos en utilisant l'heuristique gloutonne
+    solutionUsingAlgoGlouton permet de donner une solution optimale du problème de sac à dos en utilisant l'heuristique gloutonne
     S : l'instance du sac à dos
     isSolutionContinue : si 1 alors on donne la solution continu, si 0 on donne la solution réalisable
 */
-void SolutionUsingAlgoGlouton (InstanceSacADosSolution *S, int isSolutionContinue)
+void solutionUsingAlgoGlouton (InstanceSacADosSolution *S, int isSolutionContinue)
 {
     int i;
     //Création du tableau d'index dans le bon ordre pour l'algorithme
@@ -248,12 +248,12 @@ int main()
         case 1:
             printf("Resultat du probeme de sac a dos avec l'heuristique gloutonne en relaxation continue : \n");
             resetSolution(&S);
-            SolutionUsingAlgoGlouton(&S, 1);
+            solutionUsingAlgoGlouton(&S, 1);
             break;
         case 2:
             printf("Resultat du probleme de sac a dos avec l'istique gloutonne avec une solution realisable :\n");
             resetSolution(&S);
-            SolutionUsingAlgoGlouton(&S, 0);
+            solutionUsingAlgoGlouton(&S, 0);
             break;
         default:
             printf("Au revoir\n");
