@@ -1,7 +1,7 @@
 /*
     TP Optimisation Combinatoire Jordane QUINCY et Jean-Baptiste DURIEZ
-    Etat : Exercice 1 et 2 finis, en cours : Exercice 3
-    Version : 11/12/2015 (Première séance de TP)
+    Etat : Exercice 1 et 2  et 3finis, en cours : Exercice 4 (l'arbre est Construit)
+    Version : 18/12/2015 (Deuxieme séance de TP)
 */
 
 #include <stdio.h>
@@ -41,7 +41,21 @@ typedef struct
     SolutionSacADos solution;
 } InstanceSacADosSolution;
 
-InstanceSacADosSolution initialisation(int nbrObjet, int capaciteMax,Objet *objets)
+typedef struct n
+{
+    int *objets;//indice de l'objet
+    float borneSup;
+    float borneMoins;//en théorie la borne moins sera toujours un int
+    struct n *fg;
+    struct n *fd;
+}Noeud;
+
+typedef Noeud *Arbre;
+
+int maxBorneMoinsDansArbre; //pour la gestion du branch and bound
+int *tabSolution; //pour la gestion du branch and bound
+
+InstanceSacADosSolution initialisation(int nbrObjet, int capaciteMax, Objet *objets)
 {
     InstanceSacADosSolution S;
     int i;
@@ -151,7 +165,7 @@ void ajouterTrie (int *tab, Objet objet, int index, Objet *objets, int taille)
     }
 };
 
-void afficherSolutionGlouton (InstanceSacADosSolution S)
+float afficherSolutionGlouton (InstanceSacADosSolution S)
 {
     int i;
     float solutionOpti = 0;
@@ -176,6 +190,7 @@ void afficherSolutionGlouton (InstanceSacADosSolution S)
         solutionOpti += (float)(S.solution.objetsSolution[i].present) * S.solution.objetsSolution[i].objet.profit;
     }
     printf("La valeur de la solution optimale avec l'heuristique gloutonne est : %.2f\n", solutionOpti);
+    return solutionOpti;
 
 };
 
@@ -184,7 +199,7 @@ void afficherSolutionGlouton (InstanceSacADosSolution S)
     S : l'instance du sac à dos
     isSolutionContinue : si 1 alors on donne la solution continu, si 0 on donne la solution réalisable
 */
-void solutionUsingAlgoGlouton (InstanceSacADosSolution *S, int isSolutionContinue)
+float solutionUsingAlgoGlouton (InstanceSacADosSolution *S, int isSolutionContinue)
 {
     int i;
     //Création du tableau d'index dans le bon ordre pour l'algorithme
@@ -211,7 +226,7 @@ void solutionUsingAlgoGlouton (InstanceSacADosSolution *S, int isSolutionContinu
             S->solution.poidsTotalSolution = S->instance.capaciteMax;
         }
     }
-    afficherSolutionGlouton(*S);
+    return afficherSolutionGlouton(*S);
 };
 
 void resetSolution(InstanceSacADosSolution *S)
@@ -292,6 +307,124 @@ void solutionUsingDynamicProgrammation (InstanceSacADosSolution *S) {
 
 };
 
+
+
+
+void ajouterObjet(int *objets, int idOfObjet) {
+    int i = 0;
+    printf("Dans le while\n");
+    while (objets[i] >= 0) {
+
+        printf("valeur objets[%d] : %d\n", i, objets[i]);
+        i++;
+    }
+    objets[i] = idOfObjet;
+    printf("Apres le while\n");
+    for (i = 0; i < 3; i++) {
+        printf("valeur objets[%d] : %d\n", i, objets[i]);
+    }
+};
+
+
+InstanceSacADosSolution modifierInstance(InstanceSacADosSolution S, int idObjet, int present) {
+    //Creation du nouveau Pb
+    //Modification de la capacite
+    int capaciteMax = S.instance.capaciteMax;
+    if (present) {
+        capaciteMax = capaciteMax - S.instance.objets[idObjet].poids;
+    }
+    //Modification de la liste d'objt
+    Objet *newTab;
+    newTab = malloc((S.instance.nbrObjet - 1) * sizeof(Objet));
+    int i;
+    for (i = 0; i < S.instance.nbrObjet - 1; i++) {
+        newTab[i].poids = S.instance.objets[i+1].poids;
+        newTab[i].profit = S.instance.objets[i+1].profit;
+    }
+    printf("Changement d'instance !\n");
+    for (i = 0 ; i < S.instance.nbrObjet -1 ; i++) {
+        printf("objet %d, poids: %d, profit : %d\n", i, newTab[i].poids, newTab[i].profit);
+    }
+    return initialisation(S.instance.nbrObjet - 1, capaciteMax, newTab);
+};
+
+Arbre creerArbre(int present, int itteration , int *ancienObjets, InstanceSacADosSolution S, InstanceSacADosSolution SdeBase) {
+    int i;
+    Arbre A;
+    A = malloc(sizeof(Noeud));
+    A->objets = malloc(SdeBase.instance.nbrObjet * sizeof(int));
+    InstanceSacADosSolution newS;
+    for (i = 0; i <= SdeBase.instance.nbrObjet; i++) {
+        A->objets[i] = ancienObjets[i];
+    }
+    if (present == 1) {
+        ajouterObjet(A->objets, itteration);
+        newS = modifierInstance(S, itteration, 1);
+    }
+    else {
+       newS = modifierInstance(S, itteration, 0);
+    }
+
+    float profitPrecedent = 0;
+    for (i = 0; i < SdeBase.instance.nbrObjet; i++) {
+        if (A->objets[i] >= 0) {
+            profitPrecedent = profitPrecedent + SdeBase.instance.objets[A->objets[i]].profit;
+        }
+    }
+    printf("ProfitPrecedent : %f\n", profitPrecedent);
+
+    A->borneMoins = profitPrecedent + solutionUsingAlgoGlouton(&newS, 0);
+    resetSolution(&newS);
+    A->borneSup = profitPrecedent + solutionUsingAlgoGlouton(&newS, 1);
+    resetSolution(&newS);
+    /*if (A->borneMoins == A->borneSup) {
+        A->fg = NULL;
+        A->fd = NULL;
+    }*/
+    if (A->borneMoins - profitPrecedent == 0 ) {
+        A->fg = NULL;
+        A->fd = NULL;
+        if (maxBorneMoinsDansArbre <= A->borneMoins) {
+            maxBorneMoinsDansArbre = A->borneMoins;
+            tabSolution = A->objets;
+        }
+    }
+    else if (maxBorneMoinsDansArbre > A->borneSup) {
+        A->fg = NULL;
+        A->fd = NULL;
+    }
+    else{
+        if (maxBorneMoinsDansArbre <= A->borneMoins) {
+            maxBorneMoinsDansArbre = A->borneMoins;
+            tabSolution = A->objets;
+        }
+        A->fg = creerArbre(0, itteration + 1, A->objets, newS, SdeBase);
+        A->fd = creerArbre(1, itteration + 1, A->objets, newS, SdeBase);
+    }
+    return A;
+}
+
+Arbre construireArbre(InstanceSacADosSolution S) {
+    Arbre A;
+    int i;
+    A = malloc(sizeof(Noeud));
+    A->objets = malloc(S.instance.nbrObjet * sizeof(int));
+    for (i = 0; i < S.instance.nbrObjet; i++) {
+        A->objets[i] = -1;
+    }
+    A->borneMoins = solutionUsingAlgoGlouton(&S, 0);
+    resetSolution(&S);
+    A->borneSup = solutionUsingAlgoGlouton(&S, 1);
+    resetSolution(&S);
+    printf("Borne moins : %f\nBorne plus : %f\n", A->borneMoins, A->borneSup);
+    maxBorneMoinsDansArbre = A->borneMoins;
+    tabSolution = malloc(S.instance.nbrObjet * sizeof(int));
+    tabSolution = A->objets;
+    A->fg = creerArbre(0, 0, A->objets, S, S);
+    A->fd = creerArbre(1, 0, A->objets, S, S);
+    return A;
+};
+
 int main()
 {
     char nomFichier[50];
@@ -309,6 +442,7 @@ int main()
         printf("1 - Resoudre le probleme du sac a dos en utilisant l'heuristique gloutonne (relaxation continue)\n");
         printf("2 - Resoudre le probleme du sac a dos en utilisant l'heuristique gloutonne (solution realisable)\n");
         printf("3 - Resoudre le probleme du sac a dos en utilisant un algorithme de programmation dynamique\n");
+        printf("4 - Resoudre le probleme du sac a dos en utilisant un algorithme Branch and Bound\n");
         printf("0 - Sortir du programme ? \n");
         scanf("%d", &choix);
         printf("\n\n");
@@ -328,6 +462,11 @@ int main()
             printf("Resultat du probleme de sac a dos avec un algorithme de programmation dynamique :\n");
             resetSolution(&S);
             solutionUsingDynamicProgrammation(&S);
+            break;
+        case 4:
+            resetSolution(&S);
+            Arbre A = construireArbre(S);
+            //On arrive à construire le bon arbre mais il faut recup la liste des objets
             break;
         default:
             printf("Au revoir\n");
